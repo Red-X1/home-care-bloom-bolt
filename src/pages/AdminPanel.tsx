@@ -405,7 +405,7 @@ const AdminPanelContent = () => {
                         rows={4}
                       />
                     </div>
-                    <ImageUploa
+                    <ImageUpload
                       currentImage={forms.about.image}
                       onImageChange={(imageUrl) => updateForm('about', 'image', imageUrl)}
                       label="Изображение"
