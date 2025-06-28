@@ -2,14 +2,14 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { Trash2, Plus } from 'lucide-react';
 import { Facebook, Instagram, Youtube, Twitter, Linkedin } from 'lucide-react';
 
-interface SocialMediaLink {
+interface ContactSocialLink {
   id: string;
   platform: string;
   url: string;
@@ -17,9 +17,9 @@ interface SocialMediaLink {
   visible: boolean;
 }
 
-interface SocialMediaManagerProps {
-  socialLinks: SocialMediaLink[];
-  onSocialLinksChange: (links: SocialMediaLink[]) => void;
+interface ContactSocialManagerProps {
+  socialLinks: ContactSocialLink[];
+  onSocialLinksChange: (links: ContactSocialLink[]) => void;
 }
 
 const SOCIAL_PLATFORMS = [
@@ -35,7 +35,7 @@ const SOCIAL_PLATFORMS = [
   { value: 'pinterest', label: 'Pinterest', icon: null }
 ];
 
-const SocialMediaManager = ({ socialLinks, onSocialLinksChange }: SocialMediaManagerProps) => {
+const ContactSocialManager = ({ socialLinks, onSocialLinksChange }: ContactSocialManagerProps) => {
   const [newLink, setNewLink] = useState({
     platform: '',
     url: '',
@@ -45,7 +45,7 @@ const SocialMediaManager = ({ socialLinks, onSocialLinksChange }: SocialMediaMan
 
   const addSocialLink = () => {
     if (newLink.platform && newLink.url) {
-      const link: SocialMediaLink = {
+      const link: ContactSocialLink = {
         id: Date.now().toString(),
         platform: newLink.platform,
         url: newLink.url,
@@ -61,7 +61,7 @@ const SocialMediaManager = ({ socialLinks, onSocialLinksChange }: SocialMediaMan
     onSocialLinksChange(socialLinks.filter(link => link.id !== id));
   };
 
-  const updateSocialLink = (id: string, field: keyof SocialMediaLink, value: any) => {
+  const updateSocialLink = (id: string, field: keyof ContactSocialLink, value: any) => {
     onSocialLinksChange(
       socialLinks.map(link => 
         link.id === id ? { ...link, [field]: value } : link
@@ -92,7 +92,8 @@ const SocialMediaManager = ({ socialLinks, onSocialLinksChange }: SocialMediaMan
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Управление социальными сетями</CardTitle>
+        <CardTitle>Социальные сети в контактах</CardTitle>
+        <CardDescription>Управление социальными сетями для раздела контактов</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -205,4 +206,4 @@ const SocialMediaManager = ({ socialLinks, onSocialLinksChange }: SocialMediaMan
   );
 };
 
-export default SocialMediaManager;
+export default ContactSocialManager;

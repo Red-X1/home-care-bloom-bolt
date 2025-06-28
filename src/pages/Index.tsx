@@ -1,4 +1,3 @@
-
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
 import About from '@/components/About';
@@ -8,10 +7,21 @@ import Gallery from '@/components/Gallery';
 import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
 import ScrollToTop from '@/components/ScrollToTop';
+import DynamicSections from '@/components/DynamicSections';
 import { useSiteContent } from '@/hooks/useSiteContent';
+import { useThemeSettings } from '@/hooks/useThemeSettings';
+import { useEffect } from 'react';
 
 const Index = () => {
   const { sectionVisibility, loading } = useSiteContent();
+  const { themeSettings, loading: themeLoading } = useThemeSettings();
+
+  // Apply theme settings on load
+  useEffect(() => {
+    if (!themeLoading && themeSettings) {
+      // Theme is already applied in the hook
+    }
+  }, [themeSettings, themeLoading]);
 
   // Show all sections by default if loading or if visibility data is not available
   const visibility = loading ? {
@@ -29,6 +39,7 @@ const Index = () => {
       {visibility.hero && <Hero />}
       {visibility.about && <About />}
       {visibility.products && <Products />}
+      <DynamicSections />
       {visibility.team && <Team />}
       {visibility.gallery && <Gallery />}
       {visibility.contact && <Contact />}

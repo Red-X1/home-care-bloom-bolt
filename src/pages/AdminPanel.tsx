@@ -13,7 +13,10 @@ import { AuthProvider } from '@/hooks/useAuth';
 import AdminLogin from '@/components/AdminLogin';
 import ProductManager from '@/components/ProductManager';
 import SocialMediaManager from '@/components/SocialMediaManager';
+import ContactSocialManager from '@/components/ContactSocialManager';
 import SectionVisibilityManager from '@/components/SectionVisibilityManager';
+import ThemeManager from '@/components/ThemeManager';
+import DynamicSectionManager from '@/components/DynamicSectionManager';
 import ImageUpload from '@/components/ImageUpload';
 import { useSiteContent } from '@/hooks/useSiteContent';
 import { useSiteSections } from '@/hooks/useSiteSections';
@@ -84,7 +87,8 @@ const AdminPanelContent = () => {
       address: '',
       phone: '',
       email: '',
-      workingHours: ''
+      workingHours: '',
+      socialLinks: []
     }
   });
 
@@ -220,8 +224,9 @@ const AdminPanelContent = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-10">
+          <TabsList className="grid w-full grid-cols-12">
             <TabsTrigger value="products">Продукты</TabsTrigger>
+            <TabsTrigger value="dynamic">Секции</TabsTrigger>
             <TabsTrigger value="header">Заголовок</TabsTrigger>
             <TabsTrigger value="hero">Главный блок</TabsTrigger>
             <TabsTrigger value="about">О нас</TabsTrigger>
@@ -230,11 +235,20 @@ const AdminPanelContent = () => {
             <TabsTrigger value="footer">Footer</TabsTrigger>
             <TabsTrigger value="contact">Контакты</TabsTrigger>
             <TabsTrigger value="social">Соц. сети</TabsTrigger>
+            <TabsTrigger value="theme">Тема</TabsTrigger>
             <TabsTrigger value="visibility">Видимость</TabsTrigger>
           </TabsList>
 
           <TabsContent value="products" className="space-y-4">
             <ProductManager />
+          </TabsContent>
+
+          <TabsContent value="dynamic" className="space-y-4">
+            <DynamicSectionManager />
+          </TabsContent>
+
+          <TabsContent value="theme" className="space-y-4">
+            <ThemeManager />
           </TabsContent>
 
           <TabsContent value="header" className="space-y-4">
@@ -391,7 +405,7 @@ const AdminPanelContent = () => {
                         rows={4}
                       />
                     </div>
-                    <ImageUpload
+                    <ImageUploa
                       currentImage={forms.about.image}
                       onImageChange={(imageUrl) => updateForm('about', 'image', imageUrl)}
                       label="Изображение"
@@ -716,6 +730,12 @@ const AdminPanelContent = () => {
                         rows={3}
                       />
                     </div>
+                    
+                    <ContactSocialManager
+                      socialLinks={forms.contact.socialLinks || []}
+                      onSocialLinksChange={(links) => updateForm('contact', 'socialLinks', links)}
+                    />
+                    
                     <Button onClick={() => handleSaveSection('contact')}>
                       Сохранить Контакты
                     </Button>
