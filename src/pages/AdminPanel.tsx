@@ -15,7 +15,6 @@ import ProductManager from '@/components/ProductManager';
 import SocialMediaManager from '@/components/SocialMediaManager';
 import ContactSocialManager from '@/components/ContactSocialManager';
 import SectionVisibilityManager from '@/components/SectionVisibilityManager';
-import ThemeManager from '@/components/ThemeManager';
 import DynamicSectionManager from '@/components/DynamicSectionManager';
 import ImageUpload from '@/components/ImageUpload';
 import { useSiteContent } from '@/hooks/useSiteContent';
@@ -224,7 +223,7 @@ const AdminPanelContent = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-12">
+          <TabsList className="grid w-full grid-cols-11">
             <TabsTrigger value="products">Продукты</TabsTrigger>
             <TabsTrigger value="dynamic">Секции</TabsTrigger>
             <TabsTrigger value="header">Заголовок</TabsTrigger>
@@ -235,7 +234,6 @@ const AdminPanelContent = () => {
             <TabsTrigger value="footer">Footer</TabsTrigger>
             <TabsTrigger value="contact">Контакты</TabsTrigger>
             <TabsTrigger value="social">Соц. сети</TabsTrigger>
-            <TabsTrigger value="theme">Тема</TabsTrigger>
             <TabsTrigger value="visibility">Видимость</TabsTrigger>
           </TabsList>
 
@@ -245,10 +243,6 @@ const AdminPanelContent = () => {
 
           <TabsContent value="dynamic" className="space-y-4">
             <DynamicSectionManager />
-          </TabsContent>
-
-          <TabsContent value="theme" className="space-y-4">
-            <ThemeManager />
           </TabsContent>
 
           <TabsContent value="header" className="space-y-4">

@@ -9,19 +9,9 @@ import Footer from '@/components/Footer';
 import ScrollToTop from '@/components/ScrollToTop';
 import DynamicSections from '@/components/DynamicSections';
 import { useSiteContent } from '@/hooks/useSiteContent';
-import { useThemeSettings } from '@/hooks/useThemeSettings';
-import { useEffect } from 'react';
 
 const Index = () => {
   const { sectionVisibility, loading } = useSiteContent();
-  const { themeSettings, loading: themeLoading } = useThemeSettings();
-
-  // Apply theme settings on load
-  useEffect(() => {
-    if (!themeLoading && themeSettings) {
-      // Theme is already applied in the hook
-    }
-  }, [themeSettings, themeLoading]);
 
   // Show all sections by default if loading or if visibility data is not available
   const visibility = loading ? {
