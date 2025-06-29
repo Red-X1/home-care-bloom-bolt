@@ -7,7 +7,6 @@ import Gallery from '@/components/Gallery';
 import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
 import ScrollToTop from '@/components/ScrollToTop';
-import DynamicSections from '@/components/DynamicSections';
 import { useSiteContent } from '@/hooks/useSiteContent';
 
 const Index = () => {
@@ -29,7 +28,6 @@ const Index = () => {
       {visibility.hero && <Hero />}
       {visibility.about && <About />}
       {visibility.products && <Products />}
-      <DynamicSections />
       {visibility.team && <Team />}
       {visibility.gallery && <Gallery />}
       {visibility.contact && <Contact />}

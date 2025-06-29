@@ -15,7 +15,6 @@ import ProductManager from '@/components/ProductManager';
 import SocialMediaManager from '@/components/SocialMediaManager';
 import ContactSocialManager from '@/components/ContactSocialManager';
 import SectionVisibilityManager from '@/components/SectionVisibilityManager';
-import DynamicSectionManager from '@/components/DynamicSectionManager';
 import ImageUpload from '@/components/ImageUpload';
 import { useSiteContent } from '@/hooks/useSiteContent';
 import { useSiteSections } from '@/hooks/useSiteSections';
@@ -223,9 +222,8 @@ const AdminPanelContent = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-11">
+          <TabsList className="grid w-full grid-cols-10">
             <TabsTrigger value="products">Продукты</TabsTrigger>
-            <TabsTrigger value="dynamic">Секции</TabsTrigger>
             <TabsTrigger value="header">Заголовок</TabsTrigger>
             <TabsTrigger value="hero">Главный блок</TabsTrigger>
             <TabsTrigger value="about">О нас</TabsTrigger>
@@ -239,10 +237,6 @@ const AdminPanelContent = () => {
 
           <TabsContent value="products" className="space-y-4">
             <ProductManager />
-          </TabsContent>
-
-          <TabsContent value="dynamic" className="space-y-4">
-            <DynamicSectionManager />
           </TabsContent>
 
           <TabsContent value="header" className="space-y-4">
