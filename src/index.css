@@ -158,14 +158,6 @@
     color: hsl(var(--brand-pink)) !important;
   }
 
-  .dark .bg-sky-500 {
-    @apply bg-sky-500;
-  }
-
-  .dark .hover\:bg-sky-400:hover {
-    @apply bg-sky-400;
-  }
-
   .dark .bg-blue-50 {
     @apply bg-blue-900/20;
   }
