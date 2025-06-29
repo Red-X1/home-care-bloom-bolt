@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
@@ -82,6 +81,7 @@
   body {
     @apply bg-background text-foreground;
     font-family: 'Inter', sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
   
   .section-title {
@@ -110,6 +110,68 @@
   
   .text-brand-dark {
     color: hsl(var(--brand-dark));
+  }
+
+  /* Dark mode specific styles for main page */
+  .dark .bg-white {
+    @apply bg-gray-900;
+  }
+
+  .dark .bg-gray-50 {
+    @apply bg-gray-800;
+  }
+
+  .dark .text-gray-600 {
+    @apply text-gray-300;
+  }
+
+  .dark .text-gray-700 {
+    @apply text-gray-200;
+  }
+
+  .dark .text-gray-800 {
+    @apply text-gray-100;
+  }
+
+  .dark .text-gray-900 {
+    @apply text-white;
+  }
+
+  .dark .text-brand-dark {
+    @apply text-white;
+  }
+
+  .dark .border-gray-300 {
+    @apply border-gray-600;
+  }
+
+  .dark .border-gray-200 {
+    @apply border-gray-700;
+  }
+
+  /* Preserve button and accent colors in dark mode */
+  .dark .bg-brand-pink {
+    background-color: hsl(var(--brand-pink)) !important;
+  }
+
+  .dark .text-brand-pink {
+    color: hsl(var(--brand-pink)) !important;
+  }
+
+  .dark .bg-sky-500 {
+    @apply bg-sky-500;
+  }
+
+  .dark .hover\:bg-sky-400:hover {
+    @apply bg-sky-400;
+  }
+
+  .dark .bg-blue-50 {
+    @apply bg-blue-900/20;
+  }
+
+  .dark .text-blue-500 {
+    @apply text-blue-400;
   }
 }
 

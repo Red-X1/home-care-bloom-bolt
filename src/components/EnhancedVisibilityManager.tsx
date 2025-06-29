@@ -32,6 +32,7 @@ const EnhancedVisibilityManager = () => {
   const [allSections, setAllSections] = useState<SectionItem[]>([]);
   const [draggedItem, setDraggedItem] = useState<number | null>(null);
   const [hasChanges, setHasChanges] = useState(false);
+  const [originalOrder, setOriginalOrder] = useState<SectionItem[]>([]);
   const { toast } = useToast();
 
   // Initialize sections list
@@ -56,6 +57,8 @@ const EnhancedVisibilityManager = () => {
 
     const combined = [...staticSections, ...dynamicSectionItems].sort((a, b) => a.order - b.order);
     setAllSections(combined);
+    setOriginalOrder([...combined]);
+    setHasChanges(false);
   }, [sectionVisibility, dynamicSections]);
 
   const handleDragStart = (e: React.DragEvent, index: number) => {
@@ -115,21 +118,25 @@ const EnhancedVisibilityManager = () => {
     try {
       // Save dynamic sections order
       const dynamicSectionUpdates = allSections
-        .filter(section => section.type === 'dynamic')
+        .filter(section => section.type === 'dynamic' && section.originalId)
         .map(async (section, index) => {
-          if (section.originalId) {
-            const newOrder = allSections.findIndex(s => s.id === section.id);
-            return updateSectionOrder(section.originalId, newOrder);
-          }
+          const newOrder = allSections.findIndex(s => s.id === section.id);
+          console.log(`Updating section ${section.originalId} to order ${newOrder}`);
+          return await updateSectionOrder(section.originalId!, newOrder);
         });
 
-      await Promise.all(dynamicSectionUpdates);
+      const results = await Promise.all(dynamicSectionUpdates);
       
-      setHasChanges(false);
-      toast({
-        title: "Успех",
-        description: "Порядок разделов успешно сохранен",
-      });
+      if (results.every(result => result === true)) {
+        setHasChanges(false);
+        setOriginalOrder([...allSections]);
+        toast({
+          title: "Успех",
+          description: "Порядок разделов успешно сохранен",
+        });
+      } else {
+        throw new Error('Some updates failed');
+      }
     } catch (error) {
       console.error('Error saving section order:', error);
       toast({
@@ -137,7 +144,15 @@ const EnhancedVisibilityManager = () => {
         description: "Не удалось сохранить порядок разделов",
         variant: "destructive",
       });
+      // Revert to original order
+      setAllSections([...originalOrder]);
+      setHasChanges(false);
     }
+  };
+
+  const resetOrder = () => {
+    setAllSections([...originalOrder]);
+    setHasChanges(false);
   };
 
   return (
@@ -150,10 +165,15 @@ const EnhancedVisibilityManager = () => {
           </p>
         </div>
         {hasChanges && (
-          <Button onClick={saveOrder} className="bg-green-600 hover:bg-green-700">
-            <Save className="w-4 h-4 mr-2" />
-            Сохранить порядок
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={resetOrder}>
+              Отменить
+            </Button>
+            <Button onClick={saveOrder} className="bg-green-600 hover:bg-green-700">
+              <Save className="w-4 h-4 mr-2" />
+              Сохранить порядок
+            </Button>
+          </div>
         )}
       </div>
 

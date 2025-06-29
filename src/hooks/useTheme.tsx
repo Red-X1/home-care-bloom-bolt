@@ -76,40 +76,19 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     const root = document.documentElement;
     
     if (isDarkMode) {
-      // Dark mode - only change background and text colors, preserve accent colors
-      root.style.setProperty('--theme-primary', colors.primary);
-      root.style.setProperty('--theme-secondary', colors.secondary);
-      root.style.setProperty('--theme-accent', colors.accent);
-      root.style.setProperty('--theme-background', '#0f0f0f');
-      root.style.setProperty('--theme-foreground', '#ffffff');
-      root.style.setProperty('--theme-muted', '#1e1e1e');
-      root.style.setProperty('--theme-border', '#333333');
-      
-      // Additional dark mode variables
-      root.style.setProperty('--theme-card', '#1e1e1e');
-      root.style.setProperty('--theme-card-foreground', '#ffffff');
-      root.style.setProperty('--theme-popover', '#1e1e1e');
-      root.style.setProperty('--theme-popover-foreground', '#ffffff');
-      
       root.classList.add('dark');
     } else {
-      // Light mode
-      root.style.setProperty('--theme-primary', colors.primary);
-      root.style.setProperty('--theme-secondary', colors.secondary);
-      root.style.setProperty('--theme-accent', colors.accent);
-      root.style.setProperty('--theme-background', colors.background);
-      root.style.setProperty('--theme-foreground', colors.foreground);
-      root.style.setProperty('--theme-muted', colors.muted);
-      root.style.setProperty('--theme-border', colors.border);
-      
-      // Additional light mode variables
-      root.style.setProperty('--theme-card', '#ffffff');
-      root.style.setProperty('--theme-card-foreground', colors.foreground);
-      root.style.setProperty('--theme-popover', '#ffffff');
-      root.style.setProperty('--theme-popover-foreground', colors.foreground);
-      
       root.classList.remove('dark');
     }
+
+    // Apply custom colors
+    root.style.setProperty('--theme-primary', colors.primary);
+    root.style.setProperty('--theme-secondary', colors.secondary);
+    root.style.setProperty('--theme-accent', colors.accent);
+    root.style.setProperty('--theme-background', colors.background);
+    root.style.setProperty('--theme-foreground', colors.foreground);
+    root.style.setProperty('--theme-muted', colors.muted);
+    root.style.setProperty('--theme-border', colors.border);
   };
 
   const toggleDarkMode = async () => {
