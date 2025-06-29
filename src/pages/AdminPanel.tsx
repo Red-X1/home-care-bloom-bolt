@@ -4,24 +4,107 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
-import { Trash2, Plus, LogOut } from 'lucide-react';
+import { Trash2, Plus } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { AuthProvider } from '@/hooks/useAuth';
 import AdminLogin from '@/components/AdminLogin';
 import ProductManager from '@/components/ProductManager';
-import SocialMediaManager from '@/components/SocialMediaManager';
-import SectionVisibilityManager from '@/components/SectionVisibilityManager';
 import ImageUpload from '@/components/ImageUpload';
 import { useSiteContent } from '@/hooks/useSiteContent';
 import { useSiteSections } from '@/hooks/useSiteSections';
+import DynamicSectionManager from '@/components/DynamicSectionManager';
+import ThemeCustomizer from '@/components/ThemeCustomizer';
+import UnifiedSocialMediaManager from '@/components/UnifiedSocialMediaManager';
+import DynamicSectionEditor from '@/components/DynamicSectionEditor';
+import DynamicSidebar from '@/components/DynamicSidebar';
+import DarkModeToggle from '@/components/DarkModeToggle';
+import EnhancedVisibilityManager from '@/components/EnhancedVisibilityManager';
+import { useDynamicSections } from '@/hooks/useDynamicSections';
+
+interface SectionVisibility {
+  hero: boolean;
+  about: boolean;
+  team: boolean;
+  gallery: boolean;
+  products: boolean;
+  contact: boolean;
+}
+
+interface HeaderForm {
+  logoType: string;
+  logoText: string;
+  logoImage: string;
+  navLinks: any[];
+}
+
+interface HeroForm {
+  subtitle: string;
+  title: string;
+  description: string;
+  backgroundImage: string;
+  primaryButtonText: string;
+  secondaryButtonText: string;
+}
+
+interface AboutForm {
+  subtitle: string;
+  title: string;
+  description: string;
+  secondDescription: string;
+  image: string;
+  buttonText: string;
+}
+
+interface TeamForm {
+  subtitle: string;
+  title: string;
+  description: string;
+  buttonText: string;
+  members: any[];
+}
+
+interface GalleryForm {
+  subtitle: string;
+  title: string;
+  description: string;
+  images: string[];
+}
+
+interface FooterForm {
+  companyName: string;
+  description: string;
+  address: string;
+  phone: string;
+  email: string;
+  socialLinks: any[];
+}
+
+interface ContactForm {
+  title: string;
+  subtitle: string;
+  address: string;
+  phone: string;
+  email: string;
+  workingHours: string;
+}
+
+interface Forms {
+  header: HeaderForm;
+  hero: HeroForm;
+  about: AboutForm;
+  team: TeamForm;
+  gallery: GalleryForm;
+  footer: FooterForm;
+  contact: ContactForm;
+}
 
 const AdminPanelContent = () => {
   const { toast } = useToast();
   const { isAuthenticated, logout } = useAuth();
-  const [activeTab, setActiveTab] = useState('products');
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const { sections: dynamicSections } = useDynamicSections();
   const { 
     footerContent, 
     contactContent, 
@@ -34,10 +117,10 @@ const AdminPanelContent = () => {
   const { sections, loading: sectionsLoading, updateSection, getSection } = useSiteSections();
 
   // Form states for each section
-  const [forms, setForms] = useState({
+  const [forms, setForms] = useState<Forms>({
     header: {
       logoType: 'text',
-      logoText: 'ЧИСТЫЙ ДОМ',
+      logoText: 'CLEAN HOME',
       logoImage: '',
       navLinks: []
     },
@@ -46,8 +129,8 @@ const AdminPanelContent = () => {
       title: '',
       description: '',
       backgroundImage: '',
-      primaryButtonText: 'Смотреть продукты',
-      secondaryButtonText: 'Узнать больше'
+      primaryButtonText: 'View Products',
+      secondaryButtonText: 'Learn More'
     },
     about: {
       subtitle: '',
@@ -90,6 +173,26 @@ const AdminPanelContent = () => {
 
   const [dataLoaded, setDataLoaded] = useState(false);
 
+  // Russian translations for section names
+  const getSectionTitle = (sectionName: string) => {
+    const translations = {
+      dashboard: 'Панель управления',
+      products: 'Товары',
+      sections: 'Управление разделами',
+      theme: 'Настройки темы',
+      header: 'Настройки заголовка',
+      hero: 'Главный блок',
+      about: 'О нас',
+      team: 'Команда',
+      gallery: 'Галерея',
+      footer: 'Подвал сайта',
+      contact: 'Контакты',
+      social: 'Социальные сети',
+      visibility: 'Управление видимостью'
+    };
+    return translations[sectionName as keyof typeof translations] || sectionName;
+  };
+
   // Initialize forms when data loads - only once
   useEffect(() => {
     if (!sectionsLoading && !siteContentLoading && !dataLoaded) {
@@ -128,8 +231,8 @@ const AdminPanelContent = () => {
   const handleLogout = () => {
     logout();
     toast({
-      title: "Выход выполнен",
-      description: "Вы успешно вышли из админ-панели.",
+      title: "Logged Out",
+      description: "You have successfully logged out of the admin panel.",
     });
   };
 
@@ -160,8 +263,8 @@ const AdminPanelContent = () => {
 
     if (success) {
       toast({
-        title: "Успех",
-        description: `Раздел "${sectionName}" успешно сохранен`,
+        title: "Success",
+        description: `Section "${sectionName}" successfully saved`,
       });
     }
   };
@@ -169,8 +272,8 @@ const AdminPanelContent = () => {
   const addTeamMember = () => {
     const newMember = {
       id: Date.now(),
-      name: 'Новый сотрудник',
-      role: 'Должность',
+      name: 'New Employee',
+      role: 'Position',
       image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=1470&q=80'
     };
     updateForm('team', 'members', [...forms.team.members, newMember]);
@@ -203,45 +306,98 @@ const AdminPanelContent = () => {
 
   const loading = siteContentLoading || sectionsLoading;
 
+  // Check if we're viewing a dynamic section
+  const isDynamicSection = activeTab.startsWith('section-');
+  const currentSection = isDynamicSection 
+    ? dynamicSections.find(s => s.id === parseInt(activeTab.replace('section-', '')))
+    : null;
+
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-8 flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Админ-панель</h1>
-            <p className="text-gray-600">Полное управление контентом сайта и каталогом продукции</p>
-          </div>
-          <div className="space-x-4">
-            <Button variant="outline" onClick={handleLogout}>
-              <LogOut className="w-4 h-4 mr-2" />
-              Выйти
-            </Button>
-          </div>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex w-full">
+      <DynamicSidebar 
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        onLogout={handleLogout}
+      />
+
+      {/* Main Content */}
+      <div className="flex-1 overflow-hidden">
+        {/* Header */}
+        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 flex items-center justify-between">
+          <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
+            {isDynamicSection && currentSection ? currentSection.title : getSectionTitle(activeTab)}
+          </h1>
+          <DarkModeToggle />
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-10">
-            <TabsTrigger value="products">Продукты</TabsTrigger>
-            <TabsTrigger value="header">Заголовок</TabsTrigger>
-            <TabsTrigger value="hero">Главный блок</TabsTrigger>
-            <TabsTrigger value="about">О нас</TabsTrigger>
-            <TabsTrigger value="team">Команда</TabsTrigger>
-            <TabsTrigger value="gallery">Галерея</TabsTrigger>
-            <TabsTrigger value="footer">Footer</TabsTrigger>
-            <TabsTrigger value="contact">Контакты</TabsTrigger>
-            <TabsTrigger value="social">Соц. сети</TabsTrigger>
-            <TabsTrigger value="visibility">Видимость</TabsTrigger>
-          </TabsList>
+        <div className="p-4 lg:p-8 h-full overflow-y-auto">
+          {/* Dashboard */}
+          {activeTab === 'dashboard' && (
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Панель управления</h2>
+                <p className="text-gray-600 dark:text-gray-400">Обзор и быстрые действия</p>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <Card className="cursor-pointer hover:shadow-md transition-shadow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700" onClick={() => setActiveTab('sections')}>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
+                      🧩 <span>Управление разделами</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Управление пользовательскими разделами</p>
+                  </CardContent>
+                </Card>
 
-          <TabsContent value="products" className="space-y-4">
-            <ProductManager />
-          </TabsContent>
+                <Card className="cursor-pointer hover:shadow-md transition-shadow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700" onClick={() => setActiveTab('products')}>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
+                      📦 <span>Товары</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Управление каталогом товаров</p>
+                  </CardContent>
+                </Card>
 
-          <TabsContent value="header" className="space-y-4">
+                <Card className="cursor-pointer hover:shadow-md transition-shadow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700" onClick={() => setActiveTab('theme')}>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
+                      🎨 <span>Тема</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Настройка цветов и темы</p>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          )}
+
+          {/* Enhanced Visibility Manager */}
+          {activeTab === 'visibility' && <EnhancedVisibilityManager />}
+          
+          {/* Dynamic Section Editor */}
+          {isDynamicSection && currentSection && (
+            <DynamicSectionEditor
+              section={currentSection}
+              onClose={() => setActiveTab('sections')}
+            />
+          )}
+
+          {/* Other Tabs */}
+          {activeTab === 'products' && <ProductManager />}
+          {activeTab === 'sections' && <DynamicSectionManager />}
+          {activeTab === 'theme' && <ThemeCustomizer />}
+          {activeTab === 'social' && <UnifiedSocialMediaManager />}
+          
+          {activeTab === 'header' && (
             <Card>
               <CardHeader>
                 <CardTitle>Настройки заголовка</CardTitle>
-                <CardDescription>Настройте логотип и навигационное меню</CardDescription>
+                <CardDescription>Настройка логотипа и навигационного меню</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {loading ? (
@@ -283,13 +439,13 @@ const AdminPanelContent = () => {
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
+          )}
 
-          <TabsContent value="hero" className="space-y-4">
+          {activeTab === 'hero' && (
             <Card>
               <CardHeader>
                 <CardTitle>Главный экран</CardTitle>
-                <CardDescription>Настройте основной баннер сайта</CardDescription>
+                <CardDescription>Настройка главного баннера сайта</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {loading ? (
@@ -333,7 +489,7 @@ const AdminPanelContent = () => {
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label>Текст второй кнопки</Label>
+                        <Label>Текст вторичной кнопки</Label>
                         <Input
                           value={forms.hero.secondaryButtonText}
                           onChange={(e) => updateForm('hero', 'secondaryButtonText', e.target.value)}
@@ -348,12 +504,12 @@ const AdminPanelContent = () => {
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
+          )}
 
-          <TabsContent value="about" className="space-y-4">
+          {activeTab === 'about' && (
             <Card>
               <CardHeader>
-                <CardTitle>Секция "О нас"</CardTitle>
+                <CardTitle>Раздел "О нас"</CardTitle>
                 <CardDescription>Информация о компании</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -411,13 +567,13 @@ const AdminPanelContent = () => {
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
+          )}
 
-          <TabsContent value="team" className="space-y-4">
+          {activeTab === 'team' && (
             <Card>
               <CardHeader>
                 <CardTitle>Управление командой</CardTitle>
-                <CardDescription>Добавляйте и редактируйте участников команды</CardDescription>
+                <CardDescription>Добавление и редактирование членов команды</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {loading ? (
@@ -459,10 +615,10 @@ const AdminPanelContent = () => {
 
                     <div className="space-y-4">
                       <div className="flex justify-between items-center">
-                        <h3 className="text-lg font-semibold">Участники команды</h3>
+                        <h3 className="text-lg font-semibold">Члены команды</h3>
                         <Button onClick={addTeamMember} size="sm">
                           <Plus className="w-4 h-4 mr-2" />
-                          Добавить участника
+                          Добавить сотрудника
                         </Button>
                       </div>
                       
@@ -518,13 +674,13 @@ const AdminPanelContent = () => {
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
+          )}
 
-          <TabsContent value="gallery" className="space-y-4">
+          {activeTab === 'gallery' && (
             <Card>
               <CardHeader>
                 <CardTitle>Управление галереей</CardTitle>
-                <CardDescription>Добавляйте и редактируйте изображения в галерее</CardDescription>
+                <CardDescription>Добавление и редактирование изображений галереи</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {loading ? (
@@ -596,13 +752,13 @@ const AdminPanelContent = () => {
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
+          )}
 
-          <TabsContent value="footer" className="space-y-4">
+          {activeTab === 'footer' && (
             <Card>
               <CardHeader>
-                <CardTitle>Настройки Footer</CardTitle>
-                <CardDescription>Редактируйте информацию в подвале сайта</CardDescription>
+                <CardTitle>Настройки подвала</CardTitle>
+                <CardDescription>Редактирование информации в подвале сайта</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {loading ? (
@@ -648,19 +804,19 @@ const AdminPanelContent = () => {
                       </div>
                     </div>
                     <Button onClick={() => handleSaveSection('footer')}>
-                      Сохранить Footer
+                      Сохранить подвал
                     </Button>
                   </>
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
+          )}
 
-          <TabsContent value="contact" className="space-y-4">
+          {activeTab === 'contact' && (
             <Card>
               <CardHeader>
                 <CardTitle>Настройки контактов</CardTitle>
-                <CardDescription>Редактируйте информацию в разделе контактов</CardDescription>
+                <CardDescription>Редактирование информации в разделе контактов</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {loading ? (
@@ -708,43 +864,24 @@ const AdminPanelContent = () => {
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label>Рабочие часы</Label>
+                      <Label>Часы работы</Label>
                       <Textarea
                         value={forms.contact.workingHours}
                         onChange={(e) => updateForm('contact', 'workingHours', e.target.value)}
-                        placeholder="Пн-Пт: 9:00 - 18:00&#10;Сб-Вс: Выходные"
+                        placeholder="Пн-Пт: 9:00 - 18:00&#10;Сб-Вс: Выходной"
                         rows={3}
                       />
                     </div>
+                    
                     <Button onClick={() => handleSaveSection('contact')}>
-                      Сохранить Контакты
+                      Сохранить контакты
                     </Button>
                   </>
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
-
-          <TabsContent value="social" className="space-y-4">
-            <SocialMediaManager
-              socialLinks={forms.footer.socialLinks || []}
-              onSocialLinksChange={(links) => updateForm('footer', 'socialLinks', links)}
-            />
-            <Button onClick={() => handleSaveSection('footer')}>
-              Сохранить социальные сети
-            </Button>
-          </TabsContent>
-
-          <TabsContent value="visibility" className="space-y-4">
-            <SectionVisibilityManager
-              visibility={sectionVisibility}
-              onVisibilityChange={(section, visible) => {
-                const newVisibility = { ...sectionVisibility, [section]: visible };
-                updateSectionVisibility(newVisibility);
-              }}
-            />
-          </TabsContent>
-        </Tabs>
+          )}
+        </div>
       </div>
     </div>
   );

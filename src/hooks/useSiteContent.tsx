@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -66,12 +67,21 @@ export const useSiteContent = () => {
       console.log('Site content fetched successfully:', data);
       
       data?.forEach(item => {
-        if (item.section === 'footer') {
-          setFooterContent(item.content);
-        } else if (item.section === 'contact') {
-          setContactContent(item.content);
-        } else if (item.section === 'visibility') {
-          setSectionVisibility(prev => ({ ...prev, ...item.content }));
+        if (item.section === 'footer' && item.content) {
+          const content = item.content as any;
+          if (content && typeof content === 'object') {
+            setFooterContent(content as FooterContent);
+          }
+        } else if (item.section === 'contact' && item.content) {
+          const content = item.content as any;
+          if (content && typeof content === 'object') {
+            setContactContent(content as ContactContent);
+          }
+        } else if (item.section === 'visibility' && item.content) {
+          const content = item.content as any;
+          if (content && typeof content === 'object') {
+            setSectionVisibility(prev => ({ ...prev, ...content }));
+          }
         }
       });
     } catch (error) {
@@ -89,7 +99,7 @@ export const useSiteContent = () => {
         .from('site_content')
         .upsert({ 
           section: 'footer', 
-          content: content 
+          content: content as any
         }, {
           onConflict: 'section'
         });
@@ -129,7 +139,7 @@ export const useSiteContent = () => {
         .from('site_content')
         .upsert({ 
           section: 'contact', 
-          content: content 
+          content: content as any
         }, {
           onConflict: 'section'
         });
@@ -169,7 +179,7 @@ export const useSiteContent = () => {
         .from('site_content')
         .upsert({ 
           section: 'visibility', 
-          content: visibility 
+          content: visibility as any
         }, {
           onConflict: 'section'
         });

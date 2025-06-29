@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,12 +16,12 @@ interface SocialLink {
   visible: boolean;
 }
 
-interface SocialMediaManagerProps {
+interface ContactSocialMediaProps {
   socialLinks: SocialLink[];
   onSocialLinksChange: (links: SocialLink[]) => void;
 }
 
-const SocialMediaManager = ({ socialLinks, onSocialLinksChange }: SocialMediaManagerProps) => {
+const ContactSocialMedia = ({ socialLinks, onSocialLinksChange }: ContactSocialMediaProps) => {
   const [newLink, setNewLink] = useState({
     platform: 'facebook',
     url: '',
@@ -36,7 +37,7 @@ const SocialMediaManager = ({ socialLinks, onSocialLinksChange }: SocialMediaMan
     { value: 'youtube', label: 'YouTube', icon: '📺' },
     { value: 'telegram', label: 'Telegram', icon: '✈️' },
     { value: 'whatsapp', label: 'WhatsApp Business', icon: '📱' },
-    { value: 'vk', label: 'VK (ВКонтакте)', icon: '🅥' }, // Updated VK icon
+    { value: 'vk', label: 'VK (ВКонтакте)', icon: '🔵' },
     { value: 'tiktok', label: 'TikTok', icon: '🎵' },
     { value: 'discord', label: 'Discord', icon: '🎮' }
   ];
@@ -73,8 +74,8 @@ const SocialMediaManager = ({ socialLinks, onSocialLinksChange }: SocialMediaMan
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Социальные сети в Footer</CardTitle>
-        <CardDescription>Управление иконками социальных сетей в подвале сайта</CardDescription>
+        <CardTitle>Социальные сети в контактах</CardTitle>
+        <CardDescription>Управление иконками социальных сетей в разделе контактов</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-4">
@@ -192,4 +193,4 @@ const SocialMediaManager = ({ socialLinks, onSocialLinksChange }: SocialMediaMan
   );
 };
 
-export default SocialMediaManager;
+export default ContactSocialMedia;

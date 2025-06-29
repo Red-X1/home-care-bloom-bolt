@@ -30,6 +30,57 @@ export type Database = {
         }
         Relationships: []
       }
+      dynamic_sections: {
+        Row: {
+          background_color: string | null
+          created_at: string | null
+          description: string | null
+          font_family: string | null
+          font_size: string | null
+          font_weight: string | null
+          id: number
+          is_visible: boolean | null
+          position_order: number | null
+          section_name: string
+          subtitle: string | null
+          text_color: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          background_color?: string | null
+          created_at?: string | null
+          description?: string | null
+          font_family?: string | null
+          font_size?: string | null
+          font_weight?: string | null
+          id?: number
+          is_visible?: boolean | null
+          position_order?: number | null
+          section_name: string
+          subtitle?: string | null
+          text_color?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          background_color?: string | null
+          created_at?: string | null
+          description?: string | null
+          font_family?: string | null
+          font_size?: string | null
+          font_weight?: string | null
+          id?: number
+          is_visible?: boolean | null
+          position_order?: number | null
+          section_name?: string
+          subtitle?: string | null
+          text_color?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           category: string | null
@@ -59,6 +110,56 @@ export type Database = {
           price?: number | null
         }
         Relationships: []
+      }
+      section_items: {
+        Row: {
+          content: Json
+          created_at: string | null
+          font_family: string | null
+          font_size: string | null
+          font_weight: string | null
+          id: number
+          item_type: string
+          position_order: number | null
+          section_id: number | null
+          text_color: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          content?: Json
+          created_at?: string | null
+          font_family?: string | null
+          font_size?: string | null
+          font_weight?: string | null
+          id?: number
+          item_type: string
+          position_order?: number | null
+          section_id?: number | null
+          text_color?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          content?: Json
+          created_at?: string | null
+          font_family?: string | null
+          font_size?: string | null
+          font_weight?: string | null
+          id?: number
+          item_type?: string
+          position_order?: number | null
+          section_id?: number | null
+          text_color?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "section_items_section_id_fkey"
+            columns: ["section_id"]
+            isOneToOne: false
+            referencedRelation: "dynamic_sections"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       site_content: {
         Row: {
@@ -101,6 +202,30 @@ export type Database = {
           created_at?: string | null
           id?: number
           section_name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      theme_settings: {
+        Row: {
+          created_at: string | null
+          id: number
+          setting_name: string
+          setting_value: Json
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          setting_name: string
+          setting_value?: Json
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
+          setting_name?: string
+          setting_value?: Json
           updated_at?: string | null
         }
         Relationships: []
