@@ -1,4 +1,3 @@
-
 import { useState, useEffect, createContext, useContext } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -77,7 +76,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     const root = document.documentElement;
     
     if (isDarkMode) {
-      // Dark mode - preserve accent colors, change backgrounds and text
+      // Dark mode - only change background and text colors, preserve accent colors
       root.style.setProperty('--theme-primary', colors.primary);
       root.style.setProperty('--theme-secondary', colors.secondary);
       root.style.setProperty('--theme-accent', colors.accent);

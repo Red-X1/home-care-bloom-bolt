@@ -1,4 +1,3 @@
-
 import { motion } from 'framer-motion';
 import { useInView } from 'framer-motion';
 import { useRef } from 'react';
@@ -69,6 +68,15 @@ const DynamicSection = ({
     return weightMap[weight] || 'font-normal';
   };
 
+  const getImageSizeClass = (size: string) => {
+    const sizeMap: Record<string, string> = {
+      'small': 'w-1/4 max-w-xs',
+      'medium': 'w-1/2 max-w-md',
+      'large': 'w-full'
+    };
+    return sizeMap[size] || 'w-1/2 max-w-md';
+  };
+
   const renderItem = (item: SectionItem) => {
     const itemStyle = {
       color: item.text_color,
@@ -87,12 +95,13 @@ const DynamicSection = ({
         );
       case 'image':
         return (
-          <img
-            key={item.id}
-            src={item.content.url}
-            alt={item.content.alt || ''}
-            className="max-w-full h-auto rounded-lg"
-          />
+          <div key={item.id} className="flex justify-center">
+            <img
+              src={item.content.url}
+              alt={item.content.alt || ''}
+              className={`${getImageSizeClass(item.content.size || 'medium')} h-auto rounded-lg`}
+            />
+          </div>
         );
       case 'button':
         return (

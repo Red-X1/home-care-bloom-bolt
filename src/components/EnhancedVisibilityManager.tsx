@@ -1,12 +1,12 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
-import { GripVertical, Eye, EyeOff } from 'lucide-react';
+import { GripVertical, Eye, EyeOff, Save } from 'lucide-react';
 import { useSiteContent } from '@/hooks/useSiteContent';
 import { useDynamicSections } from '@/hooks/useDynamicSections';
+import { useToast } from '@/hooks/use-toast';
 
 interface SectionVisibility {
   hero: boolean;
@@ -23,13 +23,16 @@ interface SectionItem {
   visible: boolean;
   type: 'static' | 'dynamic';
   order: number;
+  originalId?: number;
 }
 
 const EnhancedVisibilityManager = () => {
   const { sectionVisibility, updateSectionVisibility } = useSiteContent();
-  const { sections: dynamicSections, updateSection } = useDynamicSections();
+  const { sections: dynamicSections, updateSection, updateSectionOrder } = useDynamicSections();
   const [allSections, setAllSections] = useState<SectionItem[]>([]);
   const [draggedItem, setDraggedItem] = useState<number | null>(null);
+  const [hasChanges, setHasChanges] = useState(false);
+  const { toast } = useToast();
 
   // Initialize sections list
   useEffect(() => {
@@ -42,12 +45,13 @@ const EnhancedVisibilityManager = () => {
       { id: 'contact', label: 'Контакты', visible: sectionVisibility.contact, type: 'static' as const, order: 5 }
     ];
 
-    const dynamicSectionItems = dynamicSections.map((section, index) => ({
+    const dynamicSectionItems = dynamicSections.map((section) => ({
       id: `dynamic-${section.id}`,
       label: section.title,
       visible: section.is_visible,
       type: 'dynamic' as const,
-      order: 6 + section.position_order
+      order: 6 + section.position_order,
+      originalId: section.id
     }));
 
     const combined = [...staticSections, ...dynamicSectionItems].sort((a, b) => a.order - b.order);
@@ -87,9 +91,7 @@ const EnhancedVisibilityManager = () => {
 
     setAllSections(updatedSections);
     setDraggedItem(null);
-
-    // Save the new order (you might want to implement this in your backend)
-    console.log('New section order:', updatedSections);
+    setHasChanges(true);
   };
 
   const toggleSectionVisibility = async (sectionId: string, visible: boolean) => {
@@ -109,13 +111,50 @@ const EnhancedVisibilityManager = () => {
     ));
   };
 
+  const saveOrder = async () => {
+    try {
+      // Save dynamic sections order
+      const dynamicSectionUpdates = allSections
+        .filter(section => section.type === 'dynamic')
+        .map(async (section, index) => {
+          if (section.originalId) {
+            const newOrder = allSections.findIndex(s => s.id === section.id);
+            return updateSectionOrder(section.originalId, newOrder);
+          }
+        });
+
+      await Promise.all(dynamicSectionUpdates);
+      
+      setHasChanges(false);
+      toast({
+        title: "Успех",
+        description: "Порядок разделов успешно сохранен",
+      });
+    } catch (error) {
+      console.error('Error saving section order:', error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось сохранить порядок разделов",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold">Управление видимостью разделов</h2>
-        <p className="text-gray-600 dark:text-gray-400">
-          Управляйте порядком отображения и видимостью разделов на сайте
-        </p>
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold">Управление видимостью разделов</h2>
+          <p className="text-gray-600 dark:text-gray-400">
+            Управляйте порядком отображения и видимостью разделов на сайте
+          </p>
+        </div>
+        {hasChanges && (
+          <Button onClick={saveOrder} className="bg-green-600 hover:bg-green-700">
+            <Save className="w-4 h-4 mr-2" />
+            Сохранить порядок
+          </Button>
+        )}
       </div>
 
       <Card>
@@ -130,7 +169,7 @@ const EnhancedVisibilityManager = () => {
             {allSections.map((section, index) => (
               <div
                 key={section.id}
-                className={`flex items-center justify-between p-4 border rounded-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 transition-all ${
+                className={`flex items-center justify-between p-4 border rounded-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 transition-all cursor-move ${
                   draggedItem === index ? 'opacity-50 scale-95' : 'hover:bg-gray-50 dark:hover:bg-gray-700'
                 }`}
                 draggable
@@ -179,6 +218,7 @@ const EnhancedVisibilityManager = () => {
           <p>• <strong>Видимость:</strong> Используйте переключатели для показа/скрытия разделов</p>
           <p>• <strong>Системные разделы:</strong> Встроенные разделы сайта</p>
           <p>• <strong>Пользовательские разделы:</strong> Созданные вами разделы</p>
+          <p>• <strong>Сохранение:</strong> Нажмите "Сохранить порядок" после изменения последовательности</p>
         </CardContent>
       </Card>
     </div>

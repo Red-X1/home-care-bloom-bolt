@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -100,7 +99,7 @@ export const useDynamicSections = () => {
         description: "Раздел успешно создан",
       });
 
-      fetchSections();
+      await fetchSections();
       return data;
     } catch (error) {
       console.error('Error creating section:', error);
@@ -134,12 +133,16 @@ export const useDynamicSections = () => {
 
       if (error) throw error;
 
+      // Update local state immediately
+      setSections(prev => prev.map(section => 
+        section.id === id ? { ...section, ...updates } : section
+      ));
+
       toast({
         title: "Успех",
         description: "Раздел успешно обновлен",
       });
 
-      fetchSections();
       return true;
     } catch (error) {
       console.error('Error updating section:', error);
@@ -148,6 +151,27 @@ export const useDynamicSections = () => {
         description: "Не удалось обновить раздел",
         variant: "destructive",
       });
+      return false;
+    }
+  };
+
+  const updateSectionOrder = async (sectionId: number, newOrder: number) => {
+    try {
+      const { error } = await supabase
+        .from('dynamic_sections')
+        .update({ position_order: newOrder })
+        .eq('id', sectionId);
+
+      if (error) throw error;
+
+      // Update local state immediately
+      setSections(prev => prev.map(section => 
+        section.id === sectionId ? { ...section, position_order: newOrder } : section
+      ));
+
+      return true;
+    } catch (error) {
+      console.error('Error updating section order:', error);
       return false;
     }
   };
@@ -166,7 +190,7 @@ export const useDynamicSections = () => {
         description: "Раздел успешно удален",
       });
 
-      fetchSections();
+      await fetchSections();
       return true;
     } catch (error) {
       console.error('Error deleting section:', error);
@@ -198,12 +222,22 @@ export const useDynamicSections = () => {
 
       if (error) throw error;
 
+      // Update local state immediately
+      setSections(prev => prev.map(section => {
+        if (section.id === itemData.section_id) {
+          return {
+            ...section,
+            items: [...(section.items || []), data]
+          };
+        }
+        return section;
+      }));
+
       toast({
         title: "Успех",
         description: "Элемент успешно добавлен",
       });
 
-      fetchSections();
       return data;
     } catch (error) {
       console.error('Error creating item:', error);
@@ -233,7 +267,14 @@ export const useDynamicSections = () => {
 
       if (error) throw error;
 
-      fetchSections();
+      // Update local state immediately
+      setSections(prev => prev.map(section => ({
+        ...section,
+        items: section.items?.map(item => 
+          item.id === id ? { ...item, ...updates } : item
+        ) || []
+      })));
+
       return true;
     } catch (error) {
       console.error('Error updating item:', error);
@@ -250,12 +291,17 @@ export const useDynamicSections = () => {
 
       if (error) throw error;
 
+      // Update local state immediately
+      setSections(prev => prev.map(section => ({
+        ...section,
+        items: section.items?.filter(item => item.id !== id) || []
+      })));
+
       toast({
         title: "Успех",
         description: "Элемент успешно удален",
       });
 
-      fetchSections();
       return true;
     } catch (error) {
       console.error('Error deleting item:', error);
@@ -277,6 +323,7 @@ export const useDynamicSections = () => {
     loading,
     createSection,
     updateSection,
+    updateSectionOrder,
     deleteSection,
     createItem,
     updateItem,

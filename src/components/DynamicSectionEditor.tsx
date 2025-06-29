@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,7 +14,7 @@ interface DynamicSectionEditorProps {
 }
 
 const DynamicSectionEditor = ({ section, onClose }: DynamicSectionEditorProps) => {
-  const { updateSection, createItem, updateItem, deleteItem, refetch } = useDynamicSections();
+  const { updateSection, createItem, updateItem, deleteItem } = useDynamicSections();
   const [editingSection, setEditingSection] = useState({
     title: section.title,
     subtitle: section.subtitle || '',
@@ -65,6 +64,12 @@ const DynamicSectionEditor = ({ section, onClose }: DynamicSectionEditorProps) =
     { value: '4xl', label: '4X Большой' }
   ];
 
+  const imageSizeOptions = [
+    { value: 'small', label: 'Маленький (25%)' },
+    { value: 'medium', label: 'Средний (50%)' },
+    { value: 'large', label: 'Большой (100%)' }
+  ];
+
   const handleSave = async () => {
     await updateSection(section.id, editingSection);
     onClose();
@@ -73,7 +78,7 @@ const DynamicSectionEditor = ({ section, onClose }: DynamicSectionEditorProps) =
   const handleAddItem = async (itemType: string) => {
     const defaultContent = {
       text: { text: 'Новый текст' },
-      image: { url: '', alt: 'Изображение' },
+      image: { url: '', alt: 'Изображение', size: 'medium' },
       button: { text: 'Кнопка', link: '#' },
       link: { text: 'Ссылка', url: '#' }
     };
@@ -89,7 +94,7 @@ const DynamicSectionEditor = ({ section, onClose }: DynamicSectionEditorProps) =
       position_order: sectionItems.length
     };
 
-    // Add item to database
+    // Add item to database and update local state
     const createdItem = await createItem(newItem);
     
     if (createdItem) {
@@ -181,11 +186,33 @@ const DynamicSectionEditor = ({ section, onClose }: DynamicSectionEditorProps) =
           )}
 
           {item.item_type === 'image' && (
-            <ImageUpload
-              currentImage={itemContent.url || ''}
-              onImageChange={(url) => updateLocalContent({ ...itemContent, url })}
-              label="Изображение"
-            />
+            <div className="space-y-4">
+              <ImageUpload
+                currentImage={itemContent.url || ''}
+                onImageChange={(url) => updateLocalContent({ ...itemContent, url })}
+                label="Изображение"
+              />
+              <div className="space-y-2">
+                <Label>Размер изображения</Label>
+                <select
+                  value={itemContent.size || 'medium'}
+                  onChange={(e) => updateLocalContent({ ...itemContent, size: e.target.value })}
+                  className="w-full p-2 border rounded-md"
+                >
+                  {imageSizeOptions.map(option => (
+                    <option key={option.value} value={option.value}>{option.label}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-2">
+                <Label>Альтернативный текст</Label>
+                <Input
+                  value={itemContent.alt || ''}
+                  onChange={(e) => updateLocalContent({ ...itemContent, alt: e.target.value })}
+                  placeholder="Описание изображения"
+                />
+              </div>
+            </div>
           )}
 
           {item.item_type === 'button' && (
