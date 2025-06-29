@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -6,12 +6,29 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { useThemeSettings } from '@/hooks/useThemeSettings';
+import { useToast } from '@/hooks/use-toast';
 
 const ThemeManager = () => {
   const { themeSettings, loading, updateThemeSettings } = useThemeSettings();
   const [localSettings, setLocalSettings] = useState(themeSettings);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const { toast } = useToast();
+
+  // Синхронизируем локальные настройки с глобальными
+  useEffect(() => {
+    if (!loading) {
+      setLocalSettings(themeSettings);
+    }
+  }, [themeSettings, loading]);
 
   const handleColorChange = (colorKey: string, value: string) => {
+    // Проверяем валидность hex цвета
+    const hexRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
+    if (!hexRegex.test(value)) {
+      console.warn('Invalid hex color:', value);
+      return;
+    }
+
     setLocalSettings(prev => ({
       ...prev,
       colors: {
@@ -39,7 +56,30 @@ const ThemeManager = () => {
   };
 
   const handleSave = async () => {
-    await updateThemeSettings(localSettings);
+    if (isUpdating) return;
+    
+    setIsUpdating(true);
+    try {
+      console.log('Saving theme settings:', localSettings);
+      
+      const success = await updateThemeSettings(localSettings);
+      
+      if (success) {
+        toast({
+          title: "Успех",
+          description: "Настройки темы сохранены",
+        });
+      }
+    } catch (error) {
+      console.error('Error saving theme settings:', error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось сохранить настройки темы",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   const resetToDefaults = () => {
@@ -67,7 +107,10 @@ const ThemeManager = () => {
     return (
       <Card>
         <CardContent className="p-6">
-          <p className="text-center">Загрузка настроек темы...</p>
+          <div className="flex items-center justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-pink"></div>
+            <span className="ml-2">Загрузка настроек темы...</span>
+          </div>
         </CardContent>
       </Card>
     );
@@ -270,10 +313,21 @@ const ThemeManager = () => {
       </Card>
 
       <div className="flex gap-4">
-        <Button onClick={handleSave}>
-          Сохранить настройки
+        <Button 
+          onClick={handleSave} 
+          disabled={isUpdating}
+          className="min-w-[120px]"
+        >
+          {isUpdating ? (
+            <div className="flex items-center">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+              Сохранение...
+            </div>
+          ) : (
+            'Сохранить настройки'
+          )}
         </Button>
-        <Button variant="outline" onClick={resetToDefaults}>
+        <Button variant="outline" onClick={resetToDefaults} disabled={isUpdating}>
           Сбросить к умолчанию
         </Button>
       </div>
